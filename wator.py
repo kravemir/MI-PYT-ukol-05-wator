@@ -9,6 +9,8 @@ class WaTor:
                        age_fish = 5, age_shark = 10,
                        energies = None, energy_initial = None):
         self.creatures = creatures
+        self.age_fish = age_fish
+        self.age_shark = age_shark
 
         if isinstance(self.creatures,numpy.ndarray):
             if nfish != None or nsharks != None or shape != None:
@@ -58,3 +60,43 @@ class WaTor:
 
     def count_sharks(self):
         return numpy.count_nonzero(self.creatures < 0)
+
+    def tick(self):
+        creatures = self.creatures
+        energies = self.energies
+
+        creatures = numpy.where((creatures > 0) & (creatures <= self.age_fish), creatures +1, creatures)
+        creatures = numpy.where((creatures < 0) & (creatures >= -self.age_shark), creatures -1, creatures)
+        
+        for idx in zip(*numpy.nonzero(creatures > self.age_fish)):
+            print(idx)
+            if creatures.shape[0] > 1 and creatures.shape[1] > 1:
+                positions = [
+                        (idx[0] - 1, idx[1] ),
+                        (idx[0] + 1, idx[1] ),
+                        (idx[0], idx[1] - 1),
+                        (idx[0], idx[1] + 1),
+                ]
+            elif creatures.shape[0] == 1 and creatures.shape[1] > 1:
+                positions = [
+                        (idx[0], idx[1] - 1),
+                        (idx[0], idx[1] + 1),
+                ]
+            elif creatures.shape[0] >= 1 and creatures.shape[1] == 1:
+                positions = [
+                        (idx[0] - 1, idx[1] ),
+                        (idx[0] + 1, idx[1] ),
+                ]
+            positions = [(x % creatures.shape[0], y % creatures.shape[1]) for x,y in positions]
+            positions = [(x,y) for x,y in positions if creatures[x,y] == 0]
+
+            if len(positions) > 0:
+                p = positions[randrange(0,len(positions))]
+                creatures[p[0], p[1]] = 1
+                creatures[idx[0], idx[1]] = 1
+                print(p)
+
+
+        self.creatures = creatures
+
+        return self
