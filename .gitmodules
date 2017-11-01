@@ -1,0 +1,3 @@
+[submodule "wator_tests"]
+	path = wator_tests
+	url = https://github.com/hroncok/wator_tests.git
