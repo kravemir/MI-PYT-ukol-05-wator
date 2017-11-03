@@ -67,9 +67,8 @@ class WaTor:
 
         creatures = numpy.where((creatures > 0) & (creatures <= self.age_fish), creatures +1, creatures)
         creatures = numpy.where((creatures < 0) & (creatures >= -self.age_shark), creatures -1, creatures)
-        
-        for idx in zip(*numpy.nonzero(creatures > self.age_fish)):
-            print(idx)
+
+        def get_free_positions(creatures, idx):
             if creatures.shape[0] > 1 and creatures.shape[1] > 1:
                 positions = [
                         (idx[0] - 1, idx[1] ),
@@ -89,13 +88,22 @@ class WaTor:
                 ]
             positions = [(x % creatures.shape[0], y % creatures.shape[1]) for x,y in positions]
             positions = [(x,y) for x,y in positions if creatures[x,y] == 0]
+            return positions
 
+        for idx in zip(*numpy.nonzero(creatures > 0)):
+            positions = get_free_positions(creatures,idx)
+            if len(positions) > 0:
+                p = positions[randrange(0,len(positions))]
+                creatures[p[0], p[1]] = creatures[idx[0], idx[1]]
+                creatures[idx[0], idx[1]] = 0
+
+
+        for idx in zip(*numpy.nonzero(creatures > self.age_fish)):
+            positions = get_free_positions(creatures,idx)
             if len(positions) > 0:
                 p = positions[randrange(0,len(positions))]
                 creatures[p[0], p[1]] = 1
                 creatures[idx[0], idx[1]] = 1
-                print(p)
-
 
         self.creatures = creatures
 
