@@ -7,10 +7,12 @@ class WaTor:
     def __init__(self, creatures = None, 
                        shape = None, nfish = None, nsharks = None,
                        age_fish = 5, age_shark = 10,
-                       energies = None, energy_initial = None):
+                       energies = None, energy_initial = None,
+                       consume_energy_gain = 3 ):
         self.creatures = creatures
         self.age_fish = age_fish
         self.age_shark = age_shark
+        self.consume_energy_gain = 3
 
         if isinstance(self.creatures,numpy.ndarray):
             if nfish != None or nsharks != None or shape != None:
@@ -114,21 +116,6 @@ class WaTor:
                 creatures[p[0], p[1]] = 1
                 creatures[idx[0], idx[1]] = 1
 
-        # move shark
-        for idx in zip(*numpy.nonzero(creatures < 0)):
-            positions = get_available_positions(creatures,idx)
-            fish_positions = [(x,y) for x,y in positions if creatures[x,y] > 0]
-            empty_positions = [(x,y) for x,y in positions if creatures[x,y] == 0]
-            if len(fish_positions) > 0:
-                # eat the fish
-                p = fish_positions[randrange(0,len(fish_positions))]
-                creatures[p[0], p[1]] = creatures[idx[0], idx[1]]
-                creatures[idx[0], idx[1]] = 0
-            elif len(empty_positions) > 0:
-                p = empty_positions[randrange(0,len(empty_positions))]
-                creatures[p[0], p[1]] = creatures[idx[0], idx[1]]
-                creatures[idx[0], idx[1]] = 0
-
         # reproduce shark
         for idx in zip(*numpy.nonzero(creatures < -self.age_shark)):
             positions = get_free_positions(creatures,idx)
@@ -136,7 +123,32 @@ class WaTor:
                 p = positions[randrange(0,len(positions))]
                 creatures[p[0], p[1]] = -1
                 creatures[idx[0], idx[1]] = -1
+                energies[idx[0], idx[1]] = energies[p[0], p[1]]
+
+        # move shark
+        for idx in zip(*numpy.nonzero(creatures < 0)):
+            positions = get_available_positions(creatures,idx)
+            fish_positions = [(x,y) for x,y in positions if creatures[x,y] > 0]
+            empty_positions = [(x,y) for x,y in positions if creatures[x,y] == 0]
+            if len(fish_positions) > 0:
+                p = fish_positions[randrange(0,len(fish_positions))]
+                creatures[p[0], p[1]] = creatures[idx[0], idx[1]]
+                energies[p[0], p[1]] = energies[idx[0], idx[1]] + self.consume_energy_gain
+                creatures[idx[0], idx[1]] = 0
+                energies[idx[0], idx[1]] = 0
+            elif len(empty_positions) > 0:
+                p = empty_positions[randrange(0,len(empty_positions))]
+                creatures[p[0], p[1]] = creatures[idx[0], idx[1]]
+                energies[p[0], p[1]] = energies[idx[0], idx[1]]
+                creatures[idx[0], idx[1]] = 0
+                energies[idx[0], idx[1]] = 0
+
+        energies_old = energies
+        energies = numpy.where((energies > 0), energies -1, energies)
+        for idx in zip(*numpy.nonzero((energies == 0) & (energies_old > 0))):
+            creatures[idx[0], idx[1]] = 0
 
         self.creatures = creatures
+        self.energies = energies
 
         return self
