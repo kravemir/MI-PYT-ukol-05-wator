@@ -38,10 +38,10 @@ class WaTor:
                 r = randrange(0,count-i)
 
                 if r < nfish:
-                    all_points[i] = 1
+                    all_points[i] = randrange(1,age_fish)
                     nfish -= 1
                 elif r < nfish + nsharks:
-                    all_points[i] = -1
+                    all_points[i] = - randrange(1,age_shark)
                     nsharks -= 1
                 else:
                     all_points[i] = 0
