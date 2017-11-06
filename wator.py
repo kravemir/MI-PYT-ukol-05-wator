@@ -106,7 +106,6 @@ class WaTor:
                 p = positions[randrange(0,len(positions))]
                 creatures[p[0], p[1]] = creatures[idx[0], idx[1]]
                 creatures[idx[0], idx[1]] = 0
-                print(p)
 
         # reproduce fish
         for idx in zip(*numpy.nonzero(creatures > self.age_fish)):
