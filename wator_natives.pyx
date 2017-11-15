@@ -79,51 +79,61 @@ def tick_world(
         int consume_energy_gain
     ):
     cdef numpy.ndarray[numpy.int64_t, ndim=2] energies_old
-    cdef int x,y
+    cdef int x,y, px, py
+    cdef long[:] xx, yy
+    cdef long i
 
     creatures = numpy.where((creatures > 0) & (creatures <= age_fish), creatures +1, creatures)
     creatures = numpy.where((creatures < 0) & (creatures >= -age_shark), creatures -1, creatures)
 
     # move fish
-    for x,y in zip(*numpy.nonzero(creatures > 0)):
+    xx, yy = numpy.nonzero(creatures > 0)
+    for i in range(len(xx)):
+        x,y = xx[i], yy[i]
         positions = get_free_positions(creatures,x,y)
         if len(positions) > 0:
-            p = positions[rand() % (len(positions))]
-            creatures[p[0], p[1]] = creatures[x, y]
+            px,py = positions[rand() % (len(positions))]
+            creatures[px, py] = creatures[x, y]
             creatures[x, y] = 0
 
     # reproduce fish
-    for x,y in zip(*numpy.nonzero(creatures > age_fish)):
+    xx, yy = numpy.nonzero(creatures > age_fish)
+    for i in range(len(xx)):
+        x,y = xx[i], yy[i]
         positions = get_free_positions(creatures,x,y)
         if len(positions) > 0:
-            p = positions[rand() % (len(positions))]
-            creatures[p[0], p[1]] = 1
+            px,py = positions[rand() % (len(positions))]
+            creatures[px, py] = 1
             creatures[x, y] = 1
 
     # reproduce shark
-    for x,y in zip(*numpy.nonzero(creatures < -age_shark)):
+    xx, yy = numpy.nonzero(creatures < -age_fish)
+    for i in range(len(xx)):
+        x,y = xx[i], yy[i]
         positions = get_free_positions(creatures,x,y)
         if len(positions) > 0:
-            p = positions[rand() % (len(positions))]
-            creatures[p[0], p[1]] = -1
+            px,py = positions[rand() % (len(positions))]
+            creatures[px, py] = -1
             creatures[x, y] = -1
-            energies[x, y] = energies[p[0], p[1]]
+            energies[x, y] = energies[px, py]
 
     # move shark
-    for x,y in zip(*numpy.nonzero(creatures < 0)):
+    xx, yy = numpy.nonzero(creatures < 0)
+    for i in range(len(xx)):
+        x,y = xx[i], yy[i]
         positions = get_available_positions(creatures,x,y)
         fish_positions = [(x,y) for x,y in positions if creatures[x,y] > 0]
         empty_positions = [(x,y) for x,y in positions if creatures[x,y] == 0]
         if len(fish_positions) > 0:
-            p = fish_positions[rand() % (len(fish_positions))]
-            creatures[p[0], p[1]] = creatures[x, y]
-            energies[p[0], p[1]] = energies[x, y] + consume_energy_gain
+            px,py = fish_positions[rand() % (len(fish_positions))]
+            creatures[px, py] = creatures[x, y]
+            energies[px, py] = energies[x, y] + consume_energy_gain
             creatures[x, y] = 0
             energies[x, y] = 0
         elif len(empty_positions) > 0:
-            p = empty_positions[rand() % (len(empty_positions))]
-            creatures[p[0], p[1]] = creatures[x, y]
-            energies[p[0], p[1]] = energies[x, y]
+            px,py = empty_positions[rand() % (len(empty_positions))]
+            creatures[px, py] = creatures[x, y]
+            energies[px, py] = energies[x, y]
             creatures[x, y] = 0
             energies[x, y] = 0
 
