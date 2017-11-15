@@ -11,14 +11,15 @@ cpdef numpy.ndarray[numpy.int64_t, ndim=2] generate_creatures(
         tuple shape, int nfish, int nsharks, int age_fish, int age_shark
     ):
     cdef numpy.ndarray[numpy.int64_t, ndim=2] creatures
-    cdef numpy.ndarray[numpy.int64_t, ndim=1] all_points
+    cdef numpy.int64_t* all_points
     cdef int count, r, i
 
     count = shape[0] * shape[1]
     if count < nsharks + nfish:
         raise ValueError('Too small world for such amount of fish and sharks')
 
-    all_points = numpy.zeros( (count,), dtype='int64')
+    creatures = numpy.empty( shape, dtype='int64')
+    all_points = <numpy.int64_t*> creatures.data
 
     srand(time(NULL))
 
@@ -35,5 +36,4 @@ cpdef numpy.ndarray[numpy.int64_t, ndim=2] generate_creatures(
             else:
                 all_points[i] = 0
 
-    creatures = all_points.reshape(shape)
     return creatures
