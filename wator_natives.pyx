@@ -37,6 +37,40 @@ cpdef numpy.ndarray[numpy.int64_t, ndim=2] generate_creatures(
 
     return creatures
 
+cdef get_available_positions(
+        numpy.ndarray[numpy.int64_t, ndim=2] creatures,
+        idx
+    ):
+    if creatures.shape[0] > 1 and creatures.shape[1] > 1:
+        positions = [
+                (idx[0] - 1, idx[1] ),
+                (idx[0] + 1, idx[1] ),
+                (idx[0], idx[1] - 1),
+                (idx[0], idx[1] + 1),
+        ]
+    elif creatures.shape[0] == 1 and creatures.shape[1] > 1:
+        positions = [
+                (idx[0], idx[1] - 1),
+                (idx[0], idx[1] + 1),
+        ]
+    elif creatures.shape[0] >= 1 and creatures.shape[1] == 1:
+        positions = [
+                (idx[0] - 1, idx[1] ),
+                (idx[0] + 1, idx[1] ),
+        ]
+    else:
+        positions = []
+    positions = [(x % creatures.shape[0], y % creatures.shape[1]) for x,y in positions]
+    return positions
+
+cdef get_free_positions(
+        numpy.ndarray[numpy.int64_t, ndim=2] creatures,
+        idx
+    ):
+    positions = get_available_positions(creatures,idx)
+    positions = [(x,y) for x,y in positions if creatures[x,y] == 0]
+    return positions
+
 def tick_world(
         numpy.ndarray[numpy.int64_t, ndim=2] creatures,
         numpy.ndarray[numpy.int64_t, ndim=2] energies,
@@ -48,35 +82,6 @@ def tick_world(
 
     creatures = numpy.where((creatures > 0) & (creatures <= age_fish), creatures +1, creatures)
     creatures = numpy.where((creatures < 0) & (creatures >= -age_shark), creatures -1, creatures)
-
-    def get_available_positions(creatures, idx):
-        if creatures.shape[0] > 1 and creatures.shape[1] > 1:
-            positions = [
-                    (idx[0] - 1, idx[1] ),
-                    (idx[0] + 1, idx[1] ),
-                    (idx[0], idx[1] - 1),
-                    (idx[0], idx[1] + 1),
-            ]
-        elif creatures.shape[0] == 1 and creatures.shape[1] > 1:
-            positions = [
-                    (idx[0], idx[1] - 1),
-                    (idx[0], idx[1] + 1),
-            ]
-        elif creatures.shape[0] >= 1 and creatures.shape[1] == 1:
-            positions = [
-                    (idx[0] - 1, idx[1] ),
-                    (idx[0] + 1, idx[1] ),
-            ]
-        else:
-            positions = []
-        positions = [(x % creatures.shape[0], y % creatures.shape[1]) for x,y in positions]
-        return positions
-
-    def get_free_positions(creatures, idx):
-        positions = get_available_positions(creatures,idx)
-        positions = [(x,y) for x,y in positions if creatures[x,y] == 0]
-        return positions
-
 
     # move fish
     for idx in zip(*numpy.nonzero(creatures > 0)):
