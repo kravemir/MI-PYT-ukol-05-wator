@@ -38,7 +38,15 @@ cpdef numpy.ndarray[numpy.int64_t, ndim=2] generate_creatures(
 
     return creatures
 
-def tick_world(creatures, energies, age_fish, age_shark, consume_energy_gain):
+def tick_world(
+        numpy.ndarray[numpy.int64_t, ndim=2] creatures,
+        numpy.ndarray[numpy.int64_t, ndim=2] energies,
+        int age_fish,
+        int age_shark,
+        int consume_energy_gain
+    ):
+    cdef numpy.ndarray[numpy.int64_t, ndim=2] energies_old
+
     creatures = numpy.where((creatures > 0) & (creatures <= age_fish), creatures +1, creatures)
     creatures = numpy.where((creatures < 0) & (creatures >= -age_shark), creatures -1, creatures)
 

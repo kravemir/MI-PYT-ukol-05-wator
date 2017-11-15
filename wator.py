@@ -27,6 +27,8 @@ class WaTor:
 
         if shape != None:
             self.creatures = generate_creatures(shape, nfish, nsharks, age_fish, age_shark)
+        else:
+            self.creatures = self.creatures.astype('int64')
 
         if isinstance(energies, numpy.ndarray):
             if energies.shape != self.creatures.shape:
@@ -37,7 +39,7 @@ class WaTor:
             if energy_initial == None:
                 energy_initial = 5
             energies = numpy.where(self.creatures < 0, energy_initial, 0)
-        self.energies = energies
+        self.energies = energies.astype('int64')
 
     def count_fish(self):
         return numpy.count_nonzero(self.creatures > 0)
