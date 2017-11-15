@@ -1,5 +1,4 @@
 import numpy
-from random import randrange
 
 from libc.stdlib cimport rand, srand
 from libc.time cimport time
@@ -83,7 +82,7 @@ def tick_world(
     for idx in zip(*numpy.nonzero(creatures > 0)):
         positions = get_free_positions(creatures,idx)
         if len(positions) > 0:
-            p = positions[randrange(0,len(positions))]
+            p = positions[rand() % (len(positions))]
             creatures[p[0], p[1]] = creatures[idx[0], idx[1]]
             creatures[idx[0], idx[1]] = 0
 
@@ -91,7 +90,7 @@ def tick_world(
     for idx in zip(*numpy.nonzero(creatures > age_fish)):
         positions = get_free_positions(creatures,idx)
         if len(positions) > 0:
-            p = positions[randrange(0,len(positions))]
+            p = positions[rand() % (len(positions))]
             creatures[p[0], p[1]] = 1
             creatures[idx[0], idx[1]] = 1
 
@@ -99,7 +98,7 @@ def tick_world(
     for idx in zip(*numpy.nonzero(creatures < -age_shark)):
         positions = get_free_positions(creatures,idx)
         if len(positions) > 0:
-            p = positions[randrange(0,len(positions))]
+            p = positions[rand() % (len(positions))]
             creatures[p[0], p[1]] = -1
             creatures[idx[0], idx[1]] = -1
             energies[idx[0], idx[1]] = energies[p[0], p[1]]
@@ -110,13 +109,13 @@ def tick_world(
         fish_positions = [(x,y) for x,y in positions if creatures[x,y] > 0]
         empty_positions = [(x,y) for x,y in positions if creatures[x,y] == 0]
         if len(fish_positions) > 0:
-            p = fish_positions[randrange(0,len(fish_positions))]
+            p = fish_positions[rand() % (len(fish_positions))]
             creatures[p[0], p[1]] = creatures[idx[0], idx[1]]
             energies[p[0], p[1]] = energies[idx[0], idx[1]] + consume_energy_gain
             creatures[idx[0], idx[1]] = 0
             energies[idx[0], idx[1]] = 0
         elif len(empty_positions) > 0:
-            p = empty_positions[randrange(0,len(empty_positions))]
+            p = empty_positions[rand() % (len(empty_positions))]
             creatures[p[0], p[1]] = creatures[idx[0], idx[1]]
             energies[p[0], p[1]] = energies[idx[0], idx[1]]
             creatures[idx[0], idx[1]] = 0
