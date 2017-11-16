@@ -10,11 +10,11 @@ class WaTor:
                        shape = None, nfish = None, nsharks = None,
                        age_fish = 5, age_shark = 10,
                        energies = None, energy_initial = None,
-                       consume_energy_gain = 3 ):
+                       energy_eat = 3 ):
         self.creatures = creatures
         self.age_fish = age_fish
         self.age_shark = age_shark
-        self.consume_energy_gain = 3
+        self.consume_energy_gain = energy_eat
 
         if isinstance(self.creatures,numpy.ndarray):
             if nfish != None or nsharks != None or shape != None:
