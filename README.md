@@ -15,6 +15,9 @@ python3.6 -m venv __venv__
 python -m pip install --upgrade pip wheel
 pip install -r requirements.txt
 
+# compile cython stuff
+python setup.py build_ext -i
+
 # run tests
 python3.6 -m pytest wator_tests/tests/
 
